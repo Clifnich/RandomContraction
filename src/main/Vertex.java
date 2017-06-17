@@ -46,6 +46,14 @@ public class Vertex {
 		return adjacentList;
 	}
 	
+	public void setAdjacentList(List<Vertex> adList) {
+		adjacentList = adList;
+	}
+	
+	public void setComponents(List<Vertex> comp) {
+		components = comp;
+	}
+	
 	private void setUp() {
 		components = new ArrayList<Vertex>();
 		components.add(this);

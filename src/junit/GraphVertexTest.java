@@ -57,14 +57,52 @@ public class GraphVertexTest extends TestCase {
 	/**
 	 * Will comments help?
 	 */
-	public void vertexScaleShouldDecreaseAfterMerge() {
+	public void testThatVertexScaleShouldDecreaseAfterMerge() {
 		Graph g = Graph.createGraphFromFile("verySimple.txt");
 //		Map<String, Vertex> vertexMap = g.getVertices();
 //		Vertex v1 = vertexMap.get("1");
 //		Vertex v2 = vertexMap.get("2");
-		fail();
 		g.merge("1", "2");
 		Map<String, Vertex> vertexMap = g.getVertices();
 		assertEquals(1, vertexMap.size());
+	}
+	
+	public void testThatNewVertexHasProperComponentSize() {
+		Graph g = Graph.createGraphFromFile("verySimple.txt");
+		g.merge("1", "2");
+		Map<String, Vertex> map = g.getVertices();
+		Vertex v = map.get("1-2");
+		List<Vertex> components = v.getComponents();
+		assertEquals(2, components.size());
+	}
+	
+	public void testThatNewVertexHasProperComponents() {
+		Graph g = Graph.createGraphFromFile("verySimple.txt");
+		g.merge("1", "2");
+		Map<String, Vertex> map = g.getVertices();
+		Vertex v = map.get("1-2");
+		
+		Vertex v1 = new Vertex("1");
+		Vertex v2 = new Vertex("2");
+		List<Vertex> components = v.getComponents();
+		assertTrue(v1.equals(components.get(0)) || v1.equals(components.get(1)));
+		assertTrue(v2.equals(components.get(0)) || v2.equals(components.get(1)));
+	}
+	
+	public void testThatNewVertexInheritsConnections() {
+		Graph g = Graph.createGraphFromFile("verySimple1.txt");
+		g.merge("1", "3");
+		Map<String, Vertex> map = g.getVertices();
+		Vertex v = map.get("1-3");
+		Vertex v2 = new Vertex("2");
+		List<Vertex> adjList = v.getAdjacentList();
+		//assertTrue(adjList.contains(v2));
+		
+		int count_two = 0;
+		for (Vertex v_i : adjList) {
+			if (v_i.equals(v2))
+				count_two++;
+		}
+		assertEquals(1, count_two);
 	}
 }
