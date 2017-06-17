@@ -33,6 +33,13 @@ public class Graph {
 	
 	public void add(Vertex v) {
 		vertices.put(v.getID(), v);
+		updateUEdges(v);
+	}
+	
+	public UndirectedEdge getRandomUEdge() {
+		int upper_bound = u_edges.size();
+		Random ran = new Random();
+		return u_edges.get(ran.nextInt(upper_bound));
 	}
 	
 	public Map<String, Vertex> getVertices() {
@@ -41,6 +48,35 @@ public class Graph {
 	
 	public List<UndirectedEdge> getUndirectedEdge() {
 		return u_edges;
+	}
+	
+	/**
+	 * Every time the program adds a vertex into the graph
+	 * we update the u_edges variable.
+	 * We will look through the adjacent list of that vertex,
+	 * for vertices whose label number is smaller than the root vertex,
+	 * we skip it, otherwise we create a new edge and add it into
+	 * the graph.
+	 * @param v1
+	 */
+	private void updateUEdges(Vertex v1) {
+		List<Vertex> adjacents = v1.getAdjacentList();
+		int root_id = 0;
+		try {
+			root_id = Integer.valueOf(v1.getID());
+		} catch (NumberFormatException e) {
+			System.err.println("The id of this vertex is not pure number: " + v1.getID()
+					+ "\nThus unable to add vertex.");
+			return;
+		}
+		for (Vertex v : adjacents) {
+			// here we assume the ids are all numbers
+			int id = Integer.valueOf(v.getID());
+			if (id < root_id) continue;
+			else {
+				u_edges.add(new UndirectedEdge(v, v1));
+			}
+		}
 	}
 	
 	private void setUp() {

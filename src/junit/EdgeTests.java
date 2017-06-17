@@ -32,4 +32,17 @@ public class EdgeTests extends TestCase {
 		assertTrue(e.getVertex1().equals(v1));
 		assertTrue(e.getVertex2().equals(v2));
 	}
+	
+	/**
+	 * Test resembles method.
+	 * As long as two edges have the same vertices,
+	 * they are considered as "resembled"
+	 */
+	public void testResemble() {
+		Vertex v1 = new Vertex();
+		Vertex v2 = new Vertex();
+		UndirectedEdge e1 = new UndirectedEdge(v1, v2);
+		UndirectedEdge e2 = new UndirectedEdge(v2, v1);
+		assertTrue(e1.resembles(e2));
+	}
 }

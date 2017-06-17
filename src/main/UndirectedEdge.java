@@ -7,6 +7,19 @@ public class UndirectedEdge extends Edge{
 		this.v2 = v2;
 	}
 	
+	/**
+	 * Two edges are considered "alike" as long as
+	 * they have the same vertices
+	 * @param edge
+	 * @return
+	 */
+	public boolean resembles(UndirectedEdge edge) {
+		Vertex other_v1 = edge.getVertex1();
+		Vertex other_v2 = edge.getVertex2();
+		return (other_v1.equals(v1) && other_v2.equals(v2))
+				|| (other_v1.equals(v2) && other_v2.equals(v1));
+	}
+	
 	public Vertex getVertex1() {
 		return v1;
 	}
