@@ -36,4 +36,22 @@ public class TestGraph extends TestCase {
 		Graph g = Graph.createGraphFromFile("verySimple.txt");
 		assertTrue(g != null);
 	}
+	
+	/**
+	 * Test min-cut calculation
+	 */
+	public void testSimpleMinCut() {
+		Graph g = Graph.createGraphFromFile("verySimple.txt");
+		assertEquals(1, g.getMinCut());
+	}
+	
+	public void testSimple1MinCut() {
+		Graph g = Graph.createGraphFromFile("verySimple1.txt");
+		assertEquals(1, g.getMinCut());
+	}
+	
+	public void testMinCut0() {
+		Graph g = Graph.createGraphFromFile("two.txt");
+		//assertEquals(2, g.getMinCut());
+	}
 }
