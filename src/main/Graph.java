@@ -36,6 +36,10 @@ public class Graph {
 		updateUEdges(v);
 	}
 	
+	public void merge(String id1, String id2) {
+		
+	}
+	
 	public UndirectedEdge getRandomUEdge() {
 		int upper_bound = u_edges.size();
 		Random ran = new Random();

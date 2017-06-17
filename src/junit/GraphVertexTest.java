@@ -53,4 +53,18 @@ public class GraphVertexTest extends TestCase {
 		assertTrue(list.get(0).equals(new Vertex("2")));
 		assertTrue(list.get(1).equals(new Vertex("3")));
 	}
+	
+	/**
+	 * Will comments help?
+	 */
+	public void vertexScaleShouldDecreaseAfterMerge() {
+		Graph g = Graph.createGraphFromFile("verySimple.txt");
+//		Map<String, Vertex> vertexMap = g.getVertices();
+//		Vertex v1 = vertexMap.get("1");
+//		Vertex v2 = vertexMap.get("2");
+		fail();
+		g.merge("1", "2");
+		Map<String, Vertex> vertexMap = g.getVertices();
+		assertEquals(1, vertexMap.size());
+	}
 }
