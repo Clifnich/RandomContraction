@@ -49,9 +49,10 @@ public class Graph {
 		for (Vertex v : v2.getComponents())
 			components.add(v);
 		new_vertex.setComponents(components);
+		removeSelfloop(new_vertex);
 		vertices.remove(id1);
 		vertices.remove(id2);
-		vertices.put(new_id, new_vertex);
+		vertices.put(new_id, new_vertex);	
 	}
 	
 	public UndirectedEdge getRandomUEdge() {
@@ -68,6 +69,23 @@ public class Graph {
 		return u_edges;
 	}
 	
+	private void removeSelfloop(Vertex v) {
+		List<Vertex> components = v.getComponents();
+		List<Vertex> adjList = v.getAdjacentList();
+		List<Vertex> new_adjList = new ArrayList<Vertex>();
+		for (Vertex vv : adjList) {
+			if (!listContainsVertex(components, vv)) 
+				new_adjList.add(vv);
+		}
+		v.setAdjacentList(new_adjList);
+	}
+	
+	private boolean listContainsVertex(List<Vertex> list, Vertex v) {
+		for (Vertex vv : list)
+			if (vv.equals(v))
+				return true;
+		return false;
+	}
 	/**
 	 * Every time the program adds a vertex into the graph
 	 * we update the u_edges variable.

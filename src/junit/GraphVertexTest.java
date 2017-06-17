@@ -105,4 +105,23 @@ public class GraphVertexTest extends TestCase {
 		}
 		assertEquals(1, count_two);
 	}
+	
+	public void testThatCaseOneHasNoADJVertices() {
+		Graph g = Graph.createGraphFromFile("verySimple.txt");
+		g.merge("1", "2");
+		Map<String, Vertex> map = g.getVertices();
+		Vertex v = map.get("1-2");
+		List<Vertex> list = v.getAdjacentList();
+		assertEquals(0, list.size());
+	}
+	
+	public void testThatCaseTwoHasOnlyOneADJVertex() {
+		Graph g = Graph.createGraphFromFile("verySimple1.txt");
+		g.merge("1", "3");
+		Map<String, Vertex> map = g.getVertices();
+		Vertex v = map.get("1-3");
+		List<Vertex> list = v.getAdjacentList();
+		assertEquals(1, list.size());
+		assertTrue(list.get(0).equals(new Vertex("2")));
+	}
 }
