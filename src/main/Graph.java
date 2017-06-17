@@ -49,6 +49,18 @@ public class Graph {
 		for (Vertex v : v2.getComponents())
 			components.add(v);
 		new_vertex.setComponents(components);
+		
+		// remove the edge between them
+		UndirectedEdge model = new UndirectedEdge(v1, v2);
+		List<Integer> deleteList = new ArrayList<Integer>();
+		for (int i = 0; i < u_edges.size(); i++) {
+			UndirectedEdge e = u_edges.get(i);
+			if (e.resembles(model)) 
+				deleteList.add(i);
+		}
+		for (Integer i : deleteList)
+			u_edges.remove(i.intValue());
+		
 		removeSelfloop(new_vertex);
 		vertices.remove(id1);
 		vertices.remove(id2);

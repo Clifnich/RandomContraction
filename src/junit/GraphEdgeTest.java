@@ -68,4 +68,24 @@ public class GraphEdgeTest extends TestCase {
 		UndirectedEdge e2 = new UndirectedEdge(v1, v3);
 		assertTrue(e_random.resembles(e1) || e_random.resembles(e2));
 	}
+	
+	/**
+	 * Test that after merging two vertices,
+	 * the number of edges will decrease by one
+	 */
+	public void testEdgeNumberDecreasesAfterMerge() {
+		Graph g = Graph.createGraphFromFile("verySimple.txt");
+		g.merge("1", "2");
+		assertEquals(0, g.getUndirectedEdge().size());
+	}
+	
+	/**
+	 * Increase the input size,
+	 * now the number of edges is supposed to be 1 after merging
+	 */
+	public void testEdgeNumberDecreasesAfterMerge1() {
+		Graph g = Graph.createGraphFromFile("verySimple1.txt");
+		g.merge("1", "3");
+		assertEquals(1, g.getUndirectedEdge().size());
+	}
 }
