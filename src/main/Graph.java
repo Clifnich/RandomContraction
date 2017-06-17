@@ -36,6 +36,24 @@ public class Graph {
 		updateUEdges(v);
 	}
 	
+	public void merge(String id1, String id2) {
+		String new_id = id1 + "-" + id2;
+		Vertex v1 = vertices.get(id1);
+		Vertex v2 = vertices.get(id2);
+		Vertex new_vertex = new Vertex(new_id);
+		new_vertex.setAdjacentList(v1.getAdjacentList());
+		for (Vertex v : v2.getAdjacentList()) {
+			new_vertex.add(v);
+		}
+		List<Vertex> components = v1.getComponents();
+		for (Vertex v : v2.getComponents())
+			components.add(v);
+		new_vertex.setComponents(components);
+		vertices.remove(id1);
+		vertices.remove(id2);
+		vertices.put(new_id, new_vertex);
+	}
+	
 	public UndirectedEdge getRandomUEdge() {
 		int upper_bound = u_edges.size();
 		Random ran = new Random();
