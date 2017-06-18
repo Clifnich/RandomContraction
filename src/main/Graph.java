@@ -26,8 +26,14 @@ public class Graph {
 			while ((line = rd.readLine()) != null) {
 				String[] numbers = line.split(" ");
 				Vertex v = new Vertex(numbers[0]);
-				for (int i = 1; i < numbers.length; i++)
-					v.add(new Vertex(numbers[i]));
+				for (int i = 1; i < numbers.length; i++) {
+					// for vertex with smaller label, they are already
+					// objects created, so don't create them again.
+					if (Integer.valueOf(numbers[i]) < Integer.valueOf(v.getID())) {
+						v.add(g.getVertices().get(numbers[i]));
+					} else
+						v.add(new Vertex(numbers[i]));
+				}
 				g.add(v);
 			}
 			rd.close();
@@ -63,19 +69,24 @@ public class Graph {
 		Vertex new_vertex = new Vertex(new_id);
 		if (v1 == null)
 			System.out.println("\t!!! Found it. v1 is null!!!");
-		new_vertex.setAdjacentList(v1.getAdjacentList());
-		for (Vertex v : v2.getAdjacentList()) {
-			new_vertex.add(v);
-		}
-		List<Vertex> components = v1.getComponents();
+		List<Vertex> list = new ArrayList<Vertex>();
+		for (Vertex v : v1.getAdjacentList()) 
+			list.add(v);
+		for (Vertex v : v2.getAdjacentList()) 
+			list.add(v);
+		new_vertex.setAdjacentList(list);
+		list = new ArrayList<Vertex>();
+		for (Vertex v : v1.getComponents())
+			list.add(v);
 		for (Vertex v : v2.getComponents())
-			components.add(v);
-		new_vertex.setComponents(components);
+			list.add(v);
+		new_vertex.setComponents(list);
 		
 		// remove the edge between them
 		removeEdge(v1, v2);
 		removeSelfloop(new_vertex);
-		updateEdges(v1, v2, new_vertex);
+		updateEdge(v1, v2, new_vertex);
+		updateAdjacents(v1, v2, new_vertex);
 
 		vertices.remove(id1);
 		vertices.remove(id2);
@@ -85,7 +96,9 @@ public class Graph {
 	}
 	
 	public int getMinCut() {
+		int count = 0;
 		while (vertices.size() > 2) {
+			log.info(++count + "-th iteration.");
 			UndirectedEdge e = getRandomUEdge();
 			merge(e.getVertex1().getID(), e.getVertex2().getID());
 		}
@@ -113,12 +126,43 @@ public class Graph {
 	}
 	
 	/**
+	 * Redirect all the edges that used to link to v1 or v2
+	 * to the new vertex, which is a combination of v1 and v2
+	 * @param v1
+	 * @param v2
+	 * @param new_v
+	 */
+	private void updateEdge(Vertex v1, Vertex v2, Vertex new_v) {
+		//updateAdjacents(v1, v2, new_v);
+		for (Vertex v : v1.getAdjacentList()) {
+			for (UndirectedEdge e : getEdge(v, v1))
+				e.moveOn(v1, new_v);
+		}
+		for (Vertex v : v2.getAdjacentList()) {
+			for (UndirectedEdge e : getEdge(v, v2))
+				e.moveOn(v2, new_v);
+		}
+	}
+	
+	/**
+	 * Get an edge from the u_edges variable
+	 * based on the two vertices provided
+	 */
+	private List<UndirectedEdge> getEdge(Vertex v1, Vertex v2) {
+		List<UndirectedEdge> result = new ArrayList<UndirectedEdge>();
+		UndirectedEdge e0 = new UndirectedEdge(v1, v2);
+		for (UndirectedEdge e : u_edges) {
+			if (e0.resembles(e)) result.add(e);
+		}
+		return result;
+	}
+	
+	/**
 	 * After merging two vertices, information on vertices about the edges that are
 	 * related to these two should be updated.
 	 * 
-	 * IT'S ABOUT THE EDGE!!!!
 	 */
-	private void updateEdges(Vertex v1, Vertex v2, Vertex new_v) {
+	private void updateAdjacents(Vertex v1, Vertex v2, Vertex new_v) {
 		// variable list is a list of all the vertices that connects to
 		// either v1 or v2.
 		List<Vertex> list = new ArrayList<Vertex>();
@@ -130,33 +174,55 @@ public class Graph {
 		for (Vertex v : list) {
 			List<Vertex> adjList = v.getAdjacentList();
 			// help vertex in this adjList move on
-			List<Integer> deleteList = new ArrayList<Integer>();
-			for (int i = 0; i < adjList.size(); i++) {
-				Vertex vv = adjList.get(i);
-				if (vv.equals(v1) || vv.equals(v2)) 
-					deleteList.add(i);
+			boolean finish = false;
+			while (!finish) {
+				finish = true;
+				for (Vertex vv : adjList) {
+					if (vv.equals(v1) || vv.equals(v2)) {
+						finish = false;
+						adjList.remove(vv);
+						adjList.add(new_v);
+						break;
+					}
+				}
 			}
-			for (int i = 0; i < deleteList.size(); i++)
-				adjList.add(new_v);
-			for (Integer i : deleteList)
-				adjList.remove(i.intValue());
+//			List<Integer> deleteList = new ArrayList<Integer>();
+//			for (int i = 0; i < adjList.size(); i++) {
+//				Vertex vv = adjList.get(i);
+//				if (vv.equals(v1) || vv.equals(v2)) 
+//					deleteList.add(i);
+//			}
+//			for (int i = 0; i < deleteList.size(); i++)
+//				adjList.add(new_v);
+//			for (Integer i : deleteList)
+//				adjList.remove(i.intValue());
 		}
 		
-	}
+	} 
 	
 	/**
 	 * Remove the edge between two vertices
 	 */
-	private void removeEdge(Vertex v1, Vertex v2) {
+	public void removeEdge(Vertex v1, Vertex v2) {
 		UndirectedEdge model = new UndirectedEdge(v1, v2);
-		List<Integer> deleteList = new ArrayList<Integer>();
-		for (int i = 0; i < u_edges.size(); i++) {
-			UndirectedEdge e = u_edges.get(i);
-			if (e.resembles(model)) 
-				deleteList.add(i);
+//		List<Integer> deleteList = new ArrayList<Integer>();
+//		for (int i = 0; i < u_edges.size(); i++) {
+//			UndirectedEdge e = u_edges.get(i);
+//			if (e.resembles(model)) 
+//				deleteList.add(i);
+//		}
+//		for (Integer i : deleteList)
+//			u_edges.remove(i.intValue());
+		boolean finish = false;
+		while (!finish) {
+			finish = true;
+			for (UndirectedEdge e : u_edges)
+				if (e.resembles(model)) {
+					u_edges.remove(e);
+					finish = false;
+					break;
+				}
 		}
-		for (Integer i : deleteList)
-			u_edges.remove(i.intValue());
 	}
 	
 	private void removeSelfloop(Vertex v) {
@@ -170,12 +236,19 @@ public class Graph {
 		v.setAdjacentList(new_adjList);
 	}
 	
+	/**
+	 * Check to see if the vertex list has a certain vertex or not
+	 * @param list
+	 * @param v
+	 * @return whether contains or not
+	 */
 	private boolean listContainsVertex(List<Vertex> list, Vertex v) {
 		for (Vertex vv : list)
 			if (vv.equals(v))
 				return true;
 		return false;
 	}
+	
 	/**
 	 * Every time the program adds a vertex into the graph
 	 * we update the u_edges variable.

@@ -45,4 +45,17 @@ public class EdgeTests extends TestCase {
 		UndirectedEdge e2 = new UndirectedEdge(v2, v1);
 		assertTrue(e1.resembles(e2));
 	}
+	
+	/**
+	 * Test if an undirected edge can successfully
+	 * move on
+	 */
+	public void testMoveOn() {
+		Vertex v1 = new Vertex("1");
+		Vertex v2 = new Vertex("2");
+		Vertex v3 = new Vertex("3");
+		UndirectedEdge e = new UndirectedEdge(v1, v2);
+		e.moveOn(v2, v3);
+		assertTrue(v3.equals(e.getVertex1()) || v3.equals(e.getVertex2()));
+	}
 }
