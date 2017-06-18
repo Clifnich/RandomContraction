@@ -1,15 +1,13 @@
 package main;
 import java.util.*;
-
 import org.apache.log4j.Logger;
-
 import java.io.*;
+import utility.*;
 
 // This Graph contains only undirected edges
 
 public class Graph {
 
-	static Logger log = Logger.getLogger(Graph.class);
 	/**
 	 * This method takes in the name of the file and
 	 * creates a Graph object from that file.
@@ -48,12 +46,35 @@ public class Graph {
 	}
 	
 	/**
-	 * Add a new vertex to the graph
+	 * Add a new vertex to the graph.
+	 * Every time the program adds a vertex into the graph
+	 * we update the u_edges variable.
+	 * We will look through the adjacent list of that vertex,
+	 * for vertices whose label number is smaller than the root vertex,
+	 * we skip it, otherwise we create a new edge and add it into
+	 * the graph.
+	 * NOTE: THIS IS ONLY THE CASE WHEN INITIALIZING!!
 	 * @param v
 	 */
 	public void add(Vertex v) {
 		vertices.put(v.getID(), v);
-		updateUEdges(v);
+//		List<Vertex> adjacents = v.getAdjacentList();
+		int root_id = 0;
+		try {
+			root_id = Integer.valueOf(v.getID());
+		} catch (NumberFormatException e) {
+			System.err.println("The id of this vertex is not pure number: " + v.getID()
+					+ "\nThus unable to add vertex.");
+			return;
+		}
+		for (Vertex vv : v.getAdjacentList()) {
+			// here we assume the ids are all numbers
+			int id = Integer.valueOf(vv.getID());
+			if (id < root_id) continue;
+			else {
+				u_edges.add(new UndirectedEdge(vv, v));
+			}
+		}
 	}
 	
 	/**
@@ -70,27 +91,33 @@ public class Graph {
 		if (v1 == null)
 			System.out.println("\t!!! Found it. v1 is null!!!");
 		List<Vertex> list = new ArrayList<Vertex>();
-		for (Vertex v : v1.getAdjacentList()) 
-			list.add(v);
-		for (Vertex v : v2.getAdjacentList()) 
-			list.add(v);
+		// get the adjacent vertices of the new vertex right
+		GraphUtility.addListToList(v1.getAdjacentList(), list);
+		GraphUtility.addListToList(v2.getAdjacentList(), list);
+		GraphUtility.removeDuplicates(list);
+		GraphUtility.deleteVertexFromList(v1, list);
+		GraphUtility.deleteVertexFromList(v2, list);
 		new_vertex.setAdjacentList(list);
 		list = new ArrayList<Vertex>();
-		for (Vertex v : v1.getComponents())
-			list.add(v);
-		for (Vertex v : v2.getComponents())
-			list.add(v);
+		// get the components of the new vertex right
+		GraphUtility.addListToList(v1.getComponents(), list);
+		GraphUtility.addListToList(v2.getComponents(), list);
 		new_vertex.setComponents(list);
 		
 		// remove the edge between them
-		removeEdge(v1, v2);
-		removeSelfloop(new_vertex);
-		updateEdge(v1, v2, new_vertex);
+		removeEdgeBetween(v1, v2);
+		redirectEdge(v1, v2, new_vertex);
+		// update adjacent's adjacent list
 		updateAdjacents(v1, v2, new_vertex);
-
+		
+		// remove duplicates from the adjacent's adjacent list
+		for (Vertex v : v1.getAdjacentList())
+			GraphUtility.removeDuplicates(v.getAdjacentList());
+		for (Vertex v : v2.getAdjacentList())
+			GraphUtility.removeDuplicates(v.getAdjacentList());
 		vertices.remove(id1);
 		vertices.remove(id2);
-		vertices.put(new_id, new_vertex);	
+		vertices.put(new_vertex.getID(), new_vertex);
 		log.info("[Merge Method] Remove " + id1 + " and " + id2 
 				+ " adding " + new_id);
 	}
@@ -117,13 +144,7 @@ public class Graph {
 		return result;
 	}
 	
-	public Map<String, Vertex> getVertices() {
-		return vertices;
-	}
-	
-	public List<UndirectedEdge> getUndirectedEdge() {
-		return u_edges;
-	}
+
 	
 	/**
 	 * Redirect all the edges that used to link to v1 or v2
@@ -132,7 +153,7 @@ public class Graph {
 	 * @param v2
 	 * @param new_v
 	 */
-	private void updateEdge(Vertex v1, Vertex v2, Vertex new_v) {
+	private void redirectEdge(Vertex v1, Vertex v2, Vertex new_v) {
 		//updateAdjacents(v1, v2, new_v);
 		for (Vertex v : v1.getAdjacentList()) {
 			for (UndirectedEdge e : getEdge(v, v1))
@@ -186,33 +207,15 @@ public class Graph {
 					}
 				}
 			}
-//			List<Integer> deleteList = new ArrayList<Integer>();
-//			for (int i = 0; i < adjList.size(); i++) {
-//				Vertex vv = adjList.get(i);
-//				if (vv.equals(v1) || vv.equals(v2)) 
-//					deleteList.add(i);
-//			}
-//			for (int i = 0; i < deleteList.size(); i++)
-//				adjList.add(new_v);
-//			for (Integer i : deleteList)
-//				adjList.remove(i.intValue());
 		}
 		
 	} 
 	
 	/**
-	 * Remove the edge between two vertices
+	 * Remove all the edges between the two vertices
 	 */
-	public void removeEdge(Vertex v1, Vertex v2) {
+	public void removeEdgeBetween(Vertex v1, Vertex v2) {
 		UndirectedEdge model = new UndirectedEdge(v1, v2);
-//		List<Integer> deleteList = new ArrayList<Integer>();
-//		for (int i = 0; i < u_edges.size(); i++) {
-//			UndirectedEdge e = u_edges.get(i);
-//			if (e.resembles(model)) 
-//				deleteList.add(i);
-//		}
-//		for (Integer i : deleteList)
-//			u_edges.remove(i.intValue());
 		boolean finish = false;
 		while (!finish) {
 			finish = true;
@@ -225,58 +228,23 @@ public class Graph {
 		}
 	}
 	
-	private void removeSelfloop(Vertex v) {
-		List<Vertex> components = v.getComponents();
-		List<Vertex> adjList = v.getAdjacentList();
-		List<Vertex> new_adjList = new ArrayList<Vertex>();
-		for (Vertex vv : adjList) {
-			if (!listContainsVertex(components, vv)) 
-				new_adjList.add(vv);
-		}
-		v.setAdjacentList(new_adjList);
-	}
-	
-	/**
-	 * Check to see if the vertex list has a certain vertex or not
-	 * @param list
-	 * @param v
-	 * @return whether contains or not
-	 */
-	private boolean listContainsVertex(List<Vertex> list, Vertex v) {
-		for (Vertex vv : list)
-			if (vv.equals(v))
-				return true;
-		return false;
-	}
-	
-	/**
-	 * Every time the program adds a vertex into the graph
-	 * we update the u_edges variable.
-	 * We will look through the adjacent list of that vertex,
-	 * for vertices whose label number is smaller than the root vertex,
-	 * we skip it, otherwise we create a new edge and add it into
-	 * the graph.
-	 * @param v1
-	 */
-	private void updateUEdges(Vertex v1) {
-		List<Vertex> adjacents = v1.getAdjacentList();
-		int root_id = 0;
-		try {
-			root_id = Integer.valueOf(v1.getID());
-		} catch (NumberFormatException e) {
-			System.err.println("The id of this vertex is not pure number: " + v1.getID()
-					+ "\nThus unable to add vertex.");
-			return;
-		}
-		for (Vertex v : adjacents) {
-			// here we assume the ids are all numbers
-			int id = Integer.valueOf(v.getID());
-			if (id < root_id) continue;
-			else {
-				u_edges.add(new UndirectedEdge(v, v1));
-			}
-		}
-	}
+//	/**
+//	 * Context: after two adjacent vertices are merged,
+//	 * these two vertices are counted as adjacent vertices of
+//	 * the combined new vertex. This method is meant to delete
+//	 * the old two vertices from the adjacent list.
+//	 * @param v
+//	 */
+//	private void removeInsideAdj(Vertex v) {
+//		List<Vertex> components = v.getComponents();
+//		List<Vertex> adjList = v.getAdjacentList();
+//		List<Vertex> new_adjList = new ArrayList<Vertex>();
+//		for (Vertex vv : adjList) {
+//			if (!GraphUtility.listContainsVertex(components, vv)) 
+//				new_adjList.add(vv);
+//		}
+//		v.setAdjacentList(new_adjList);
+//	}
 	
 	/**
 	 * I'm combining all the steps required to initiate 
@@ -287,8 +255,20 @@ public class Graph {
 		u_edges = new ArrayList<UndirectedEdge>();
 	}
 	
+	
+	/********     The Getter and Setters     ***********/
+	public Map<String, Vertex> getVertices() {
+		return vertices;
+	}
+	
+	public List<UndirectedEdge> getUndirectedEdge() {
+		return u_edges;
+	}
+	
 	/** The key for each vertex is its id */
 	private Map<String, Vertex> vertices;
 	
 	private List<UndirectedEdge> u_edges;
+	private static Logger log = Logger.getLogger(Graph.class);
+
 }
