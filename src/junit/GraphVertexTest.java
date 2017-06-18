@@ -89,23 +89,6 @@ public class GraphVertexTest extends TestCase {
 		assertTrue(v2.equals(components.get(0)) || v2.equals(components.get(1)));
 	}
 	
-	public void testThatNewVertexInheritsConnections() {
-		Graph g = Graph.createGraphFromFile("verySimple1.txt");
-		g.merge("1", "3");
-		Map<String, Vertex> map = g.getVertices();
-		Vertex v = map.get("1-3");
-		Vertex v2 = new Vertex("2");
-		List<Vertex> adjList = v.getAdjacentList();
-		//assertTrue(adjList.contains(v2));
-		
-		int count_two = 0;
-		for (Vertex v_i : adjList) {
-			if (v_i.equals(v2))
-				count_two++;
-		}
-		assertEquals(1, count_two);
-	}
-	
 	public void testThatCaseOneHasNoADJVertices() {
 		Graph g = Graph.createGraphFromFile("verySimple.txt");
 		g.merge("1", "2");
@@ -123,5 +106,15 @@ public class GraphVertexTest extends TestCase {
 		List<Vertex> list = v.getAdjacentList();
 		assertEquals(1, list.size());
 		assertTrue(list.get(0).equals(new Vertex("2")));
+	}
+	
+	/**
+	 * Test adjacent's adjacent,
+	 * created from createGraphFromFile method
+	 */
+	public void testMethodAdjacent() {
+		Graph g = Graph.createGraphFromFile("verySimple.txt");
+		Vertex v1 = g.getVertices().get("1");
+		assertTrue(v1.getAdjacentList().get(0).getAdjacentList().get(0).equals(v1));
 	}
 }

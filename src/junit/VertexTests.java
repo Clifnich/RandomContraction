@@ -90,4 +90,32 @@ public class VertexTests extends TestCase {
 		assertEquals(v1.getAdjacentList().size(), 1);
 		assertTrue(v1.getAdjacentList().get(0).equals(v2));
 	}
+	
+	/**
+	 * Test the moveOn method
+	 */
+	public void testMoveOnMethod() {
+		Vertex v1 = new Vertex("1");
+		Vertex v2 = new Vertex("2");
+		Vertex v3 = new Vertex("3");
+		
+		v1.add(v2);
+		v1.moveOn(v2, v3);
+		List<Vertex> list = v1.getAdjacentList();
+		assertEquals(1, list.size());
+		assertTrue(list.get(0).equals(v3));
+	}
+	
+	/**
+	 * Test adjacent's adjacent
+	 */
+	public void testDoubleAdjacent() {
+		Vertex v1 = new Vertex("1");
+		Vertex v2 = new Vertex("2");
+		v1.add(v2);
+		v2.add(v1);
+		assertTrue(v1.getAdjacentList().get(0).getAdjacentList().get(0).equals(v1));
+	}
+	
+
 }

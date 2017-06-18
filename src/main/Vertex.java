@@ -34,6 +34,14 @@ public class Vertex {
 		adjacentList.add(v);
 	}
 	
+	/**
+	 * Update one adjacent vertex with the other one
+	 */
+	public void moveOn(Vertex old_v, Vertex new_v) {
+		adjacentList.remove(old_v);
+		add(new_v);
+	}
+	
 	public String getID() {
 		return id;
 	}

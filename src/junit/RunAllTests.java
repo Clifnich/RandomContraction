@@ -17,7 +17,9 @@ public static Test suite()
     		  Class.forName("junit.GraphEdgeTest"),
     		  Class.forName("junit.GraphVertexTest"),
     		  Class.forName("junit.TestGraph"),
-    		  Class.forName("junit.VertexTests")
+    		  Class.forName("junit.VertexTests"),
+    		  Class.forName("junit.FileTwoStepByStepTest"),
+    		  Class.forName("junit.TestGraphUtility")
       };   
       
       return new TestSuite(testClasses);

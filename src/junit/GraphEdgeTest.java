@@ -88,4 +88,19 @@ public class GraphEdgeTest extends TestCase {
 		g.merge("1", "3");
 		assertEquals(1, g.getUndirectedEdge().size());
 	}
+	
+	/**
+	 * Test that after merging,
+	 * the vertex information about the edges should also
+	 * be updated.
+	 */
+	public void testVertexInfoOfEdgeAfterMergeIsUpdated() {
+		Graph g = Graph.createGraphFromFile("verySimple1.txt");
+		g.merge("1", "3");
+		UndirectedEdge e = g.getRandomUEdge();
+		Vertex v1 = e.getVertex1();
+		Vertex v2 = e.getVertex2();
+		Vertex v = new Vertex("1-3");
+		assertTrue(v.equals(v1) || v.equals(v2));
+	}
 }
