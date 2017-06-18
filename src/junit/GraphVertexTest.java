@@ -107,4 +107,14 @@ public class GraphVertexTest extends TestCase {
 		assertEquals(1, list.size());
 		assertTrue(list.get(0).equals(new Vertex("2")));
 	}
+	
+	/**
+	 * Test adjacent's adjacent,
+	 * created from createGraphFromFile method
+	 */
+	public void testMethodAdjacent() {
+		Graph g = Graph.createGraphFromFile("verySimple.txt");
+		Vertex v1 = g.getVertices().get("1");
+		assertTrue(v1.getAdjacentList().get(0).getAdjacentList().get(0).equals(v1));
+	}
 }

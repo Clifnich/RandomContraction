@@ -21,16 +21,22 @@ public class Graph {
 		try {
 			BufferedReader rd = new BufferedReader(new FileReader(file));
 			String line = "";
+			Map<String, Vertex> vertices = g.getVertices();
 			while ((line = rd.readLine()) != null) {
 				String[] numbers = line.split(" ");
-				Vertex v = new Vertex(numbers[0]);
+				String id = numbers[0];
+				Vertex v = (vertices.containsKey(id)) ? vertices.get(id) : new Vertex(id);
 				for (int i = 1; i < numbers.length; i++) {
-					// for vertex with smaller label, they are already
-					// objects created, so don't create them again.
-					if (Integer.valueOf(numbers[i]) < Integer.valueOf(v.getID())) {
-						v.add(g.getVertices().get(numbers[i]));
-					} else
-						v.add(new Vertex(numbers[i]));
+					id = numbers[i];
+					if (!vertices.containsKey(id)) 
+						vertices.put(id, new Vertex(id));
+					v.add(vertices.get(id));
+//					// for vertex with smaller label, they are already
+//					// objects created, so don't create them again.
+//					if (Integer.valueOf(numbers[i]) < Integer.valueOf(v.getID())) {
+//						v.add(g.getVertices().get(numbers[i]));
+//					} else
+//						v.add(new Vertex(numbers[i]));
 				}
 				g.add(v);
 			}

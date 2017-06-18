@@ -105,4 +105,17 @@ public class VertexTests extends TestCase {
 		assertEquals(1, list.size());
 		assertTrue(list.get(0).equals(v3));
 	}
+	
+	/**
+	 * Test adjacent's adjacent
+	 */
+	public void testDoubleAdjacent() {
+		Vertex v1 = new Vertex("1");
+		Vertex v2 = new Vertex("2");
+		v1.add(v2);
+		v2.add(v1);
+		assertTrue(v1.getAdjacentList().get(0).getAdjacentList().get(0).equals(v1));
+	}
+	
+
 }
