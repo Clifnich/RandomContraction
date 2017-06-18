@@ -23,7 +23,7 @@ public class Graph {
 			String line = "";
 			Map<String, Vertex> vertices = g.getVertices();
 			while ((line = rd.readLine()) != null) {
-				String[] numbers = line.split(" ");
+				String[] numbers = line.split("\t");
 				String id = numbers[0];
 				Vertex v = (vertices.containsKey(id)) ? vertices.get(id) : new Vertex(id);
 				for (int i = 1; i < numbers.length; i++) {

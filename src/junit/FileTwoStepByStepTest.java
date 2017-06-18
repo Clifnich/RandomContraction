@@ -151,5 +151,25 @@ public class FileTwoStepByStepTest extends TestCase {
 		list = new ArrayList<Vertex>();
 		list.add(v21);list.add(v4);
 		assertTrue(equals(list, v3.getAdjacentList()));
+		
+		// v4 adjacent to v21, v3, v5
+		list = new ArrayList<Vertex>();
+		list.add(v21);list.add(v3);list.add(v5);
+		assertTrue(equals(list, v4.getAdjacentList()));
+		
+		// v5 adjacent to v87, v6, v4
+		list = new ArrayList<Vertex>();
+		list.add(v87);list.add(v6);list.add(v4);
+		assertTrue(equals(list, v5.getAdjacentList()));
+		
+		// v6 adjacent to v87, v5
+		list = new ArrayList<Vertex>();
+		list.add(v87);list.add(v5);
+		assertTrue(equals(list, v6.getAdjacentList()));
+		
+		// v87 adjacent to v21, v5, v6
+		list = new ArrayList<Vertex>();
+		list.add(v21);list.add(v5);list.add(v6);
+		assertTrue(equals(list, v87.getAdjacentList()));
 	}
 }
